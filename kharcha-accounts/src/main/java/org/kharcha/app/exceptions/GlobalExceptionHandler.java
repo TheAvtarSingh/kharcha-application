@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericException(Exception ex) {
-        return buildErrorResponse("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse("Something went wrong"+ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 	
 	 private ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
