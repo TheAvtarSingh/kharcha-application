@@ -2,7 +2,7 @@ package org.kharcha.app.repositories;
 
 import java.util.List;
 
-import org.kharcha.app.entities.AccountType;
+import org.kharcha.kharcha.common.types.AccountType;
 import org.kharcha.app.entities.Accounts;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

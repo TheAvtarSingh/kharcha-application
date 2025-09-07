@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kharcha.app.entities.AccountType;
+import org.kharcha.kharcha.common.dtos.AccountDTO;
+import org.kharcha.kharcha.common.types.AccountType;
 import org.kharcha.app.entities.Accounts;
 import org.kharcha.app.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.mongodb.lang.NonNull;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -40,30 +39,43 @@ public class AccountController {
         return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<List<Accounts>> getAccountsByEmail(@PathVariable("email") String email) {
+    @GetMapping("/internal/{email}")
+    public ResponseEntity<List<Accounts>> getAccountsByEmail(@PathVariable("email") String email
+    ,@RequestHeader("X-Internal-Call") String header) {
+        if (!"kharcha-user".equals(header)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         List<Accounts> accounts = accountService.getAccountsByEmail(email);
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Accounts> createAccount(@RequestBody Accounts account) {
-        if (account.getAccountType() == null) {
-            throw new IllegalArgumentException("AccountType must not be null");
+    @PostMapping("/internal/")
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO account,@RequestHeader("X-Internal-Call") String header) {
+        if (!"kharcha-user".equals(header)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        Accounts created = accountService.createAccount(account);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+        if (account.getUserId() == null || account.getUserEmail() == null || account.getAccountType() == null) {
+            throw new IllegalArgumentException("AccountType , UserId and UserEmail must not be null");
+        }
+        Accounts created = accountService.createAccount(mapToAcc(account));
+        AccountDTO accountDTO = mapToDTO(created);
+        return new ResponseEntity<>(accountDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/")
-    public ResponseEntity<Accounts> updateAccount(@RequestBody Accounts account) {
+    @PutMapping("/internal/")
+    public ResponseEntity<Accounts> updateAccount(@RequestBody Accounts account,@RequestHeader("X-Internal-Call") String header) {
+        if (!"kharcha-user".equals(header)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Accounts updated = accountService.updateAccount(account);
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{userEmail}/{accountType}")
-    public ResponseEntity<?> deleteAccount(@PathVariable("userEmail") String userEmail, @PathVariable("accountType") AccountType accountType) {
+    @DeleteMapping("/internal/{userEmail}/{accountType}")
+    public ResponseEntity<?> deleteAccount(@PathVariable("userEmail") String userEmail, @PathVariable("accountType") AccountType accountType,@RequestHeader("X-Internal-Call") String header) {
+        if (!"kharcha-user".equals(header)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     	if(userEmail.equalsIgnoreCase("") || accountType == null) {
     		 Map<String, Object> map = new HashMap<>();
     	        map.put("timestamp", LocalDateTime.now());
@@ -73,5 +85,29 @@ public class AccountController {
     	}
         Accounts deleted = accountService.removeAccount(userEmail,accountType);
         return ResponseEntity.ok(deleted);
+    }
+
+    private AccountDTO mapToDTO(Accounts acc) {
+        return new AccountDTO(
+                acc.getAccountId(),
+                acc.getUserId(),
+                acc.getUserEmail(),
+                acc.getAccountType(),
+                acc.getBalance(),
+                acc.getCreatedAt(),
+                acc.getUpdatedAt()
+        );
+    }
+
+    private Accounts mapToAcc(AccountDTO acc) {
+        return new Accounts(
+                acc.getAccountId(),
+                acc.getUserId(),
+                acc.getUserEmail(),
+                acc.getAccountType(),
+                acc.getBalance(),
+                acc.getCreatedAt(),
+                acc.getUpdatedAt()
+        );
     }
 }

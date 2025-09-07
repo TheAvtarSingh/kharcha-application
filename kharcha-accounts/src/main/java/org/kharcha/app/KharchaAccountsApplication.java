@@ -6,10 +6,10 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @SpringBootApplication
 @EnableMongoAuditing
-public class KharchaApplication {
+public class KharchaAccountsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(KharchaApplication.class, args);
+		SpringApplication.run(KharchaAccountsApplication.class, args);
 	}
 
 }
