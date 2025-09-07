@@ -1,4 +1,4 @@
-package org.kharcha.kharcha_common;
+package org.kharcha.kharcha.common;
 
 /**
  * Hello world!

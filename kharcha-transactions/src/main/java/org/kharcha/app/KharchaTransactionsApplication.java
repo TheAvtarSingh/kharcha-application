@@ -2,12 +2,14 @@ package org.kharcha.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-public class KharchaApplication {
+@EnableFeignClients
+public class KharchaTransactionsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(KharchaApplication.class, args);
+		SpringApplication.run(KharchaTransactionsApplication.class, args);
 	}
 
 }

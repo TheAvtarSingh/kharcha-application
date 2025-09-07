@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kharcha.app.dto.UserUpdateDTO;
 import org.kharcha.app.entities.User;
 import org.kharcha.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +46,21 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/exists/{email}")
+    public ResponseEntity<Boolean> getUserExistsByEmail(@PathVariable("email") String email) {
+        boolean exists = userService.findUserByEmail(email);
+        return ResponseEntity.ok(exists);
+    }
+
     @PostMapping("/")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
-    @PutMapping("/")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        User updatedUser = userService.updateUser(user);
+    @PutMapping("/{email}/{oldPwd}/{newPwd}")
+    public ResponseEntity<User> updateUser(@RequestBody UserUpdateDTO updateDTO) {
+        User updatedUser = userService.updateUser(updateDTO.getUserEmail(), updateDTO.getOldPassword(), updateDTO.getNewPassword());
         return ResponseEntity.ok(updatedUser);
     }
     

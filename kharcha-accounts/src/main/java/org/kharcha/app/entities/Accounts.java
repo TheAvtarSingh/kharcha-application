@@ -1,5 +1,6 @@
 package org.kharcha.app.entities;
 
+import org.kharcha.kharcha.common.types.AccountType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,10 +19,12 @@ public class Accounts {
 	@Id
     private String accountId;
 
+	@NonNull
+	private String userId;
+
     @NonNull
     private String userEmail;
 
-    
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private AccountType accountType;
@@ -41,6 +44,12 @@ public class Accounts {
 		// TODO Auto-generated constructor stub
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
 	public String getAccountId() {
 		return accountId;
@@ -102,11 +111,12 @@ public class Accounts {
 	}
 
 
-	public Accounts(String accountId, String userEmail, AccountType accountType, BigDecimal balance,
+	public Accounts(String accountId, String userEmail,String userId, AccountType accountType, BigDecimal balance,
 			LocalDateTime createdAt, LocalDateTime updatedAt) {
 		super();
 		this.accountId = accountId;
 		this.userEmail = userEmail;
+		this.userId = userId;
 		this.accountType = accountType;
 		this.balance = balance;
 		this.createdAt = createdAt;
